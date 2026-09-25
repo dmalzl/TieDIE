@@ -5,7 +5,7 @@ from numpy import genfromtxt, dot
 import sys
 import math
 from array import array
-from scipy.sparse import coo_matrix
+from scipy.sparse import coo_matrix, csc_matrix
 from scipy.sparse.linalg import expm
 
 class SciPYKernel:
@@ -75,13 +75,14 @@ class SciPYKernel:
         # Build the graph laplacian: the CSC matrix provides a sparse matrix format
         # that can be exponentiated efficiently
         L = coo_matrix((data,(row, col)), shape=(num_nodes,num_nodes)).tocsc()
+        print(L.shape)
         time_T = -0.1
-        self.laplacian = L
+        self.laplaciain = L
         self.index2node = index2node
         # this is the matrix exponentiation calculation.
         # Uses the Pade approximiation for accurate approximation. Computationally expensive.
         # O(n^2), n= # of features, in memory as well.
-        self.kernel = expm(time_T*L)
+        self.kernel = csc_matrix(expm((time_T*L).toarray()))
         self.labels = node_order
 
         #self.printLaplacian()
